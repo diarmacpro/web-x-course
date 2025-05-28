@@ -30,7 +30,10 @@
   <script>
     $(function() {
       // Ganti URL_JSON dengan url json yang diinginkan
-      const URL_JSON = 'https://diarcourse-b4b67-default-rtdb.asia-southeast1.firebasedatabase.app/download.json';
+      const URL_JSON = 'https://diarcourse-b4b67-default-rtdb.asia-southeast1.firebasedatabase.app/data/module/list.json';
+      function isValidUrl(url) {
+        return typeof url === 'string' && /^https?:\/\//.test(url);
+      }
       $.getJSON(URL_JSON, function(data) {
         const items = Object.values(data || {});
         if (!items.length) {
@@ -38,17 +41,12 @@
           return;
         }
         items.forEach(item => {
-          const card = `<div class="bg-white rounded-lg shadow p-5 flex flex-col md:flex-row md:items-center justify-between">
-            <div>
-              <div class="font-semibold text-lg text-primary-800">${item.nama || '-'}</div>
-              <div class="text-gray-500 text-sm mb-2">${item.user ? 'User: ' + item.user : ''}</div>
-              <div class="text-xs text-gray-400">${item.stamp ? 'Stamp: ' + item.stamp : ''}</div>
-            </div>
-            <div class="mt-4 md:mt-0">
-              <a href="${item.url}" target="_blank" class="inline-block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition">Download</a>
-            </div>
-          </div>`;
-          $('#download-list').append(card);
+          const cardContent = `<div class=\"bg-white rounded-lg shadow p-5 flex flex-col md:flex-row md:items-center justify-between transition hover:shadow-lg cursor-pointer\">\n            <div>\n              <div class=\"font-semibold text-lg text-primary-800\">${item.nama || '-'}<\/div>\n              <div class=\"text-gray-500 text-sm mb-2\">${item.user ? 'User: ' + item.user : ''}<\/div>\n              <div class=\"text-xs text-gray-400\">${item.stamp ? 'Stamp: ' + item.stamp : ''}<\/div>\n            <\/div>\n            <div class=\"mt-4 md:mt-0\">\n              <span class=\"inline-block px-4 py-2 bg-blue-600 text-white rounded\">Download<\/span>\n            <\/div>\n          <\/div>`;
+          if (isValidUrl(item.url)) {
+            $('#download-list').append(`<a href="${item.url}" target="_blank" class="block group">${cardContent}<\/a>`);
+          } else {
+            $('#download-list').append(cardContent);
+          }
         });
       });
     });
