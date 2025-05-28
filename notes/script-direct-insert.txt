@@ -1,0 +1,11 @@
+insertToFirebaseX("data/module/list",{
+    "nama": "Data Engineering Fundamental - SQL Dasar Bagian II",
+    "url": "#",
+    "stamp": "2025-05-16 20:00:00",
+    "user": "admin"
+}).then((key) => {
+    console.log('User added with key:', key);
+})
+.catch((err) => {
+    console.error('Error:', err);
+});
