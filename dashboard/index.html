@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#eff6ff',
+                100: '#dbeafe',
+                200: '#bfdbfe',
+                300: '#93c5fd',
+                400: '#60a5fa',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
+                800: '#1e40af',
+                900: '#1e3a8a',
+              },
+              secondary: {
+                50: '#f5f3ff',
+                100: '#ede9fe',
+                200: '#ddd6fe',
+                300: '#c4b5fd',
+                400: '#a78bfa',
+                500: '#8b5cf6',
+                600: '#7c3aed',
+                700: '#6d28d9',
+                800: '#5b21b6',
+                900: '#4c1d95',
+              },
+              accent: {
+                50: '#f0fdfa',
+                100: '#ccfbf1',
+                200: '#99f6e4',
+                300: '#5eead4',
+                400: '#2dd4bf',
+                500: '#14b8a6',
+                600: '#0d9488',
+                700: '#0f766e',
+                800: '#115e59',
+                900: '#134e4a',
+              },
+            },
+            boxShadow: {
+              'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              'hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f9fafb;
+      }
+      
+      .module-card {
+        transition: all 0.3s ease;
+      }
+      
+      .module-card:hover {
+        transform: translateY(-4px);
+      }
+      
+      .category-pill {
+        transition: all 0.2s ease;
+      }
+      
+      .category-pill:hover {
+        filter: brightness(1.1);
+      }
+      
+      .search-input {
+        transition: all 0.2s ease;
+      }
+      
+      .search-input:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      }
+      
+      .bookmark-btn {
+        transition: all 0.2s ease;
+      }
+      
+      .bookmark-btn:hover {
+        transform: scale(1.15);
+      }
+      
+      .module-link {
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .module-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #3b82f6;
+        transition: width 0.3s ease;
+      }
+      
+      .module-link:hover::after {
+        width: 100%;
+      }
+    </style>
+    <!-- Authentication Script -->
+    <script>
+    (function() {
+      function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+      }
+      function checkAuthCookie() {
+        if (!getCookie('user_auth')) {
+          window.location.href = '../';
+        }
+      }
+      // Initial check
+      checkAuthCookie();
+      // Check every 5 seconds
+      setInterval(checkAuthCookie, 5000);
+    })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <div id="root">
+      <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-primary-600 text-2xl">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+              </span>
+              <h1 class="text-xl font-semibold text-gray-800">Module Dashboard</h1>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="bi bi-search text-gray-400"></i>
+              </div>
+              <input type="text" class="search-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Search modules...">
+            </div>
+          </div>
+        </div>
+      </header>
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Categories -->
+        <section class="mb-8">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Categories</h2>
+          <div id="category-list" class="flex flex-wrap gap-2"></div>
+        </section>
+        <!-- Favorites -->
+        <section class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Favorites</h2>
+            <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-800">View all</a>
+          </div>
+          <div id="favorites-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+        <!-- Recently Viewed -->
+        <section class="mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Recently Viewed</h2>
+            <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-800">View all</a>
+          </div>
+          <div id="recent-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+        <!-- All Modules -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">All Modules</h2>
+          </div>
+          <div id="all-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+      </main>
+      <footer class="bg-white border-t border-gray-200 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-6">
+            <p class="text-sm text-gray-500">© 2025 Module Dashboard. All rights reserved.</p>
+            <div class="flex space-x-6">
+              <a href="#" class="text-gray-500 hover:text-gray-700">
+                <i class="bi bi-question-circle"></i>
+                <span class="ml-2">Help</span>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-700">
+                <i class="bi bi-shield-check"></i>
+                <span class="ml-2">Privacy</span>
+              </a>
+              <a href="#" class="text-gray-500 hover:text-gray-700">
+                <i class="bi bi-file-text"></i>
+                <span class="ml-2">Terms</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script>
+    // Global data object for dashboard
+    const dashboardData = {
+      categories: [
+        { name: 'All', icon: '', color: 'primary' },
+        { name: 'Documentation', icon: 'bi-file-earmark-text', color: 'primary' },
+        { name: 'Tools', icon: 'bi-tools', color: 'secondary' },
+        { name: 'Settings', icon: 'bi-gear', color: 'secondary' },
+        { name: 'Reports', icon: 'bi-clipboard-data', color: 'accent' },
+        { name: 'Users', icon: 'bi-people', color: 'green' },
+      ],
+      modules: [
+        {
+          title: 'User Guide',
+          description: 'Complete documentation for all features',
+          category: 'Documentation',
+          icon: 'bi-file-earmark-text',
+          color: 'primary',
+          favorite: true,
+          recent: false
+        },
+        {
+          title: 'Admin Dashboard',
+          description: 'System administration and settings',
+          category: 'Tools',
+          icon: 'bi-tools',
+          color: 'secondary',
+          favorite: true,
+          recent: false
+        },
+        {
+          title: 'Analytics',
+          description: 'View system performance metrics',
+          category: 'Reports',
+          icon: 'bi-clipboard-data',
+          color: 'accent',
+          favorite: false,
+          recent: true
+        },
+        {
+          title: 'User Management',
+          description: 'Add and manage system users',
+          category: 'Users',
+          icon: 'bi-people',
+          color: 'green',
+          favorite: false,
+          recent: true
+        },
+        {
+          title: 'Documentation',
+          description: 'Complete user and admin guides',
+          category: 'Documentation',
+          icon: 'bi-file-earmark-text',
+          color: 'primary',
+          favorite: false,
+          recent: false
+        },
+        {
+          title: 'System Settings',
+          description: 'Configure system parameters',
+          category: 'Settings',
+          icon: 'bi-tools',
+          color: 'secondary',
+          favorite: false,
+          recent: false
+        },
+        {
+          title: 'Reports',
+          description: 'Generate and view system reports',
+          category: 'Reports',
+          icon: 'bi-clipboard-data',
+          color: 'accent',
+          favorite: false,
+          recent: false
+        },
+        {
+          title: 'Notifications',
+          description: 'Configure system notifications',
+          category: 'Settings',
+          icon: 'bi-bell',
+          color: 'purple',
+          favorite: false,
+          recent: false
+        },
+        {
+          title: 'Dashboard',
+          description: 'System overview and metrics',
+          category: 'Reports',
+          icon: 'bi-bar-chart',
+          color: 'blue',
+          favorite: false,
+          recent: false
+        }
+      ]
+    };
+    // Render categories
+    function renderCategories() {
+      const $cat = $('#category-list');
+      $cat.empty();
+      dashboardData.categories.forEach(cat => {
+        $cat.append(`<button class="category-pill px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-medium hover:bg-primary-200 active:bg-primary-300" data-category="${cat.name}">
+          ${cat.icon ? `<i class="bi ${cat.icon} me-1"></i>` : ''}${cat.name}
+        </button>`);
+      });
+    }
+    // Render modules
+    function renderModules() {
+      // Favorites
+      const $fav = $('#favorites-list');
+      $fav.empty();
+      dashboardData.modules.filter(m => m.favorite).forEach(m => {
+        $fav.append(moduleCardHtml(m));
+      });
+      // Recent
+      const $recent = $('#recent-list');
+      $recent.empty();
+      dashboardData.modules.filter(m => m.recent).forEach(m => {
+        $recent.append(moduleCardHtml(m));
+      });
+      // All
+      const $all = $('#all-list');
+      $all.empty();
+      dashboardData.modules.forEach(m => {
+        $all.append(moduleCardHtml(m));
+      });
+    }
+    // Card HTML generator
+    function moduleCardHtml(m) {
+      const colorMap = {
+        primary: 'primary-100',
+        secondary: 'secondary-100',
+        accent: 'accent-100',
+        green: 'green-100',
+        purple: 'purple-100',
+        blue: 'blue-100'
+      };
+      const iconColorMap = {
+        primary: 'primary-600',
+        secondary: 'secondary-600',
+        accent: 'accent-600',
+        green: 'green-600',
+        purple: 'purple-600',
+        blue: 'blue-600'
+      };
+      return `<div class="module-card bg-white rounded-lg shadow-soft hover:shadow-hover p-5">
+        <div class="flex justify-between items-start mb-3">
+          <div class="p-2 bg-${colorMap[m.color] || 'gray-100'} rounded-lg">
+            <i class="bi ${m.icon} text-${iconColorMap[m.color] || 'gray-600'} text-xl"></i>
+          </div>
+          <button class="bookmark-btn ${m.favorite ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}">
+            <i class="bi ${m.favorite ? 'bi-star-fill' : 'bi-star'}"></i>
+          </button>
+        </div>
+        <h3 class="font-medium text-gray-900 mb-1">${m.title}</h3>
+        <p class="text-sm text-gray-500 mb-3">${m.description}</p>
+        <div class="flex justify-between items-center">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${colorMap[m.color] || 'gray-100'} text-${iconColorMap[m.color] || 'gray-800'}">
+            ${m.category}
+          </span>
+          <a href="#" class="module-link text-sm font-medium text-primary-600 hover:text-primary-800">
+            Open <i class="bi bi-arrow-right ml-1"></i>
+          </a>
+        </div>
+      </div>`;
+    }
+    $(document).ready(function() {
+      renderCategories();
+      renderModules();
+      // Search functionality
+      $('.search-input').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
+        if (searchTerm === '') {
+          $('.module-card').show();
+          return;
+        }
+        $('.module-card').each(function() {
+          const title = $(this).find('h3').text().toLowerCase();
+          const description = $(this).find('p').text().toLowerCase();
+          const category = $(this).find('span').text().toLowerCase();
+          if (title.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      });
+      // Category filter
+      $('#category-list').on('click', '.category-pill', function() {
+        const category = $(this).data('category');
+        $('.category-pill').removeClass('bg-primary-100 text-primary-800').addClass('bg-gray-100 text-gray-800');
+        $(this).removeClass('bg-gray-100 text-gray-800').addClass('bg-primary-100 text-primary-800');
+        if (category === 'All') {
+          $('.module-card').show();
+          return;
+        }
+        $('.module-card').each(function() {
+          const cardCategory = $(this).find('span').text().trim();
+          if (cardCategory === category) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      });
+      // Bookmark toggle
+      $('#all-list, #favorites-list, #recent-list').on('click', '.bookmark-btn', function() {
+        const $btn = $(this);
+        const isFavorited = $btn.hasClass('text-yellow-500');
+        if (isFavorited) {
+          $btn.removeClass('text-yellow-500').addClass('text-gray-400');
+          $btn.html('<i class="bi bi-star"></i>');
+        } else {
+          $btn.removeClass('text-gray-400').addClass('text-yellow-500');
+          $btn.html('<i class="bi bi-star-fill"></i>');
+        }
+      });
+    });
+    </script>
+  </body>
+</html>

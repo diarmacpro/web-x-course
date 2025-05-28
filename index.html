@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Belajar Bersama - Data Engineering Fundamental</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+  <script src="./script-a.js"></script>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.5s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    .form-section {
+      transition: all 0.5s ease;
+    }
+    .form-section.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .progress-bar {
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+<body class="h-full bg-gradient-to-br from-primary-50 to-blue-100 font-sans">
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md animate-fade-in">
+      <h2 class="text-xl font-bold text-primary-800 mb-4 text-center">Masuk dengan Email & WhatsApp</h2>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500" required>
+        </div>
+        <div>
+          <label for="login-wa" class="block text-sm font-medium text-gray-700 mb-1">No WhatsApp</label>
+          <input type="tel" id="login-wa" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500" required>
+        </div>
+        <button type="submit" class="w-full py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-semibold">Masuk</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="form-container" class="min-h-screen flex flex-col hidden">
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 md:p-6">
+      <div class="container mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-primary-800 flex items-center">
+          <i class="bi bi-database-fill me-2"></i>
+          Group Belajar Bersama
+        </h1>
+        <h2 class="text-lg md:text-xl text-primary-600">Data Engineering Fundamental - Sesi 1</h2>
+      </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white shadow-sm sticky top-0 z-10">
+      <div class="container mx-auto px-4 py-2">
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div id="progress-bar" class="progress-bar bg-primary-600 h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+          <span id="progress-text">Step 1 of 4</span>
+          <span id="progress-percentage">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Sections -->
+    <div class="flex-grow container mx-auto px-4 py-8">
+      <!-- Section 1: Personal Info -->
+      <section id="section-1" class="form-section active animate-fade-in">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-3xl mx-auto animate-slide-up">
+          <h3 class="text-xl md:text-2xl font-semibold text-primary-800 mb-6">
+            Aku pengin kenalan dengan temen temen nih, boleh ya minta waktunya sebentar buat isi form berikut:
+          </h3>
+          <div class="space-y-6">
+            <div class="form-group">
+              <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+              <input type="text" id="fullName" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Aktif <span class="text-red-500">*</span></label>
+              <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="whatsapp" class="block text-sm font-medium text-gray-700 mb-1">No WhatsApp <span class="text-red-500">*</span></label>
+              <input type="tel" id="whatsapp" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="city" class="block text-sm font-medium text-gray-700 mb-1">Kota Domisili <span class="text-red-500">*</span></label>
+              <input type="text" id="city" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-end">
+            <button id="next-1" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center">
+              Selanjutnya <i class="bi bi-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Section 2: Status & Background -->
+      <section id="section-2" class="form-section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-3xl mx-auto">
+          <h3 class="text-xl md:text-2xl font-semibold text-primary-800 mb-6">Tentang Kamu</h3>
+          
+          <div class="space-y-6">
+            <div class="form-group">
+              <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status saat ini? <span class="text-red-500">*</span></label>
+              <select id="status" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+                <option value="" disabled selected>Pilih status</option>
+                <option value="Mahasiswa">Mahasiswa</option>
+                <option value="Fresh Graduate">Fresh Graduate</option>
+                <option value="Karyawan">Karyawan</option>
+                <option value="Freelancer">Freelancer</option>
+                <option value="Wirausaha">Wirausaha</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Rentang Usia Anda? <span class="text-red-500">*</span></label>
+              <select id="age" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+                <option value="" disabled selected>Pilih rentang usia</option>
+                <option value="< 20">< 20</option>
+                <option value="21-25">21–25</option>
+                <option value="26-30">26–30</option>
+                <option value="31-40">31–40</option>
+                <option value="> 40">> 40</option>
+              </select>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="field" class="block text-sm font-medium text-gray-700 mb-1">Bidang yang Anda geluti saat ini? <span class="text-red-500">*</span></label>
+              <input type="text" id="field" placeholder="Contoh: IT, Keuangan, Logistik, Pendidikan, dsb." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button id="prev-2" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center">
+              <i class="bi bi-arrow-left mr-2"></i> Kembali
+            </button>
+            <button id="next-2" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center">
+              Selanjutnya <i class="bi bi-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Section 3: Experience & Motivation -->
+      <section id="section-3" class="form-section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-3xl mx-auto">
+          <h3 class="text-xl md:text-2xl font-semibold text-primary-800 mb-6">Pengalaman & Motivasi</h3>
+          
+          <div class="space-y-6">
+            <div class="form-group">
+              <label for="sql_experience" class="block text-sm font-medium text-gray-700 mb-1">Apakah Anda sudah pernah belajar SQL sebelumnya? <span class="text-red-500">*</span></label>
+              <select id="sql_experience" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+                <option value="" disabled selected>Pilih opsi</option>
+                <option value="Belum pernah">Belum pernah</option>
+                <option value="Pernah dengar tapi belum paham">Pernah dengar tapi belum paham</option>
+                <option value="Sudah pernah belajar dasar">Sudah pernah belajar dasar</option>
+                <option value="Sudah cukup mahir">Sudah cukup mahir</option>
+              </select>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="db_experience" class="block text-sm font-medium text-gray-700 mb-1">Apakah Anda sudah memiliki pengalaman mengakses database? <span class="text-red-500">*</span></label>
+              <select id="db_experience" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" required>
+                <option value="" disabled selected>Pilih opsi</option>
+                <option value="Belum sama sekali">Belum sama sekali</option>
+                <option value="Ya, tapi hanya dari latihan/tugas">Ya, tapi hanya dari latihan/tugas</option>
+                <option value="Ya, digunakan di pekerjaan">Ya, digunakan di pekerjaan</option>
+                <option value="Tidak yakin">Tidak yakin</option>
+              </select>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="motivation" class="block text-sm font-medium text-gray-700 mb-1">Apa alasan utama Anda mengikuti pelatihan ini? <span class="text-red-500">*</span></label>
+              <textarea id="motivation" placeholder="Contoh: kebutuhan kerja, ingin pindah karier, dsb." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all h-20" required></textarea>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="challenge" class="block text-sm font-medium text-gray-700 mb-1">Apa tantangan utama Anda saat belajar SQL atau data engineering? <span class="text-red-500">*</span></label>
+              <textarea id="challenge" placeholder="Contoh: bingung mulai dari mana, kurang mentor, dsb." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all h-20" required></textarea>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button id="prev-3" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center">
+              <i class="bi bi-arrow-left mr-2"></i> Kembali
+            </button>
+            <button id="next-3" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center">
+              Selanjutnya <i class="bi bi-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Section 4: Interests & Consent -->
+      <section id="section-4" class="form-section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-3xl mx-auto">
+          <h3 class="text-xl md:text-2xl font-semibold text-primary-800 mb-6">Topik Minat & Persetujuan</h3>
+          
+          <div class="space-y-6">
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Topik lanjutan apa yang Anda minati untuk dipelajari ke depan? <span class="text-red-500">*</span></label>
+              
+              <div class="space-y-2">
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_sql" name="topics" value="SQL Lanjutan (JOIN, Subquery, dsb)" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_sql" class="ml-2 block text-sm text-gray-700">SQL Lanjutan (JOIN, Subquery, dsb)</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_modeling" name="topics" value="Data Modeling & Database Design" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_modeling" class="ml-2 block text-sm text-gray-700">Data Modeling & Database Design</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_etl" name="topics" value="ETL Tools (Airflow, dbt, dll)" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_etl" class="ml-2 block text-sm text-gray-700">ETL Tools (Airflow, dbt, dll)</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_bigdata" name="topics" value="Big Data (Hadoop, Spark)" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_bigdata" class="ml-2 block text-sm text-gray-700">Big Data (Hadoop, Spark)</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_cloud" name="topics" value="Cloud Data (BigQuery, Snowflake)" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_cloud" class="ml-2 block text-sm text-gray-700">Cloud Data (BigQuery, Snowflake)</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_python" name="topics" value="Python untuk Data Engineer" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_python" class="ml-2 block text-sm text-gray-700">Python untuk Data Engineer</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_interview" name="topics" value="Interview Preparation (Data Engineer)" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_interview" class="ml-2 block text-sm text-gray-700">Interview Preparation (Data Engineer)</label>
+                </div>
+                
+                <div class="flex items-start">
+                  <input type="checkbox" id="topic_other" name="topics" value="other" class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <label for="topic_other" class="ml-2 block text-sm text-gray-700">Lainnya:</label>
+                  <input type="text" id="topic_other_text" class="ml-2 flex-grow px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring focus:ring-primary-200 focus:border-primary-500 transition-all" placeholder="Sebutkan topik lainnya" disabled>
+                </div>
+              </div>
+              <div class="error-message text-red-500 text-sm mt-1 hidden">Pilih minimal satu topik</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Jika tersedia pelatihan lanjutan dengan Mentor langsung dan Studi kasus proyek nyata, apakah Anda tertarik ikut? <span class="text-red-500">*</span></label>
+              
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input type="radio" id="interest_very" name="interest" value="Sangat tertarik" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                  <label for="interest_very" class="ml-2 block text-sm text-gray-700">Sangat tertarik</label>
+                </div>
+                
+                <div class="flex items-center">
+                  <input type="radio" id="interest_price" name="interest" value="Tertarik" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                  <label for="interest_price" class="ml-2 block text-sm text-gray-700">Tertarik</label>
+                </div>
+                
+                <div class="flex items-center">
+                  <input type="radio" id="interest_maybe" name="interest" value="Mungkin, masih ragu" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                  <label for="interest_maybe" class="ml-2 block text-sm text-gray-700">Mungkin, masih ragu</label>
+                </div>
+                
+                <div class="flex items-center">
+                  <input type="radio" id="interest_no" name="interest" value="Tidak tertarik" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                  <label for="interest_no" class="ml-2 block text-sm text-gray-700">Tidak tertarik</label>
+                </div>
+              </div>
+              <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+            
+            <div class="form-group mt-8">
+              <div class="flex items-start bg-yellow-50 p-4 rounded-md border border-yellow-200">
+                <input type="checkbox" id="consent" class="mt-1 h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                <label for="consent" class="ml-2 block text-base font-bold text-yellow-800">
+                  Saya bersedia menerima informasi pelatihan lanjutan via WhatsApp/email (diluar WhatsApp Group)
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button id="prev-4" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center">
+              <i class="bi bi-arrow-left mr-2"></i> Kembali
+            </button>
+            <button id="submit-form" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center">
+              <i class="bi bi-check-circle mr-2"></i> Kirim Form
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Thank You Section -->
+      <section id="thank-you" class="form-section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-3xl mx-auto">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-500 mb-6">
+              <i class="bi bi-check-circle-fill text-3xl"></i>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Terima Kasih!</h3>
+            <p class="text-lg text-gray-600 mb-8">
+              Pengisian data diri untuk<br>"Data Engineering Fundamental"<br>telah berhasil.
+            </p>
+            <p class="text-md text-gray-500">
+              Sampai jumpa di sesi berikutnya!<br>Jika ada pertanyaan,<br>silakan hubungi kami di WhatsApp Group.
+              <hr class="my-5">
+              <div class="flex gap-4 justify-center">
+                <a class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" href="https://drive.google.com/file/d/1-jAU346nWokxF-XRlIt_VKvhr4Uwt7_A/" target="_blank">
+                  Link Materi Sesi 1 (PDF)
+                </a>
+                
+                <a class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" href="https://chat.whatsapp.com/FJwrFqIQDJDJbhWd4OtZAC" target="_blank">
+                  Join Group WhatsApp
+                </a>
+              </div>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-primary-800 text-white py-4 mt-auto">
+      <div class="container mx-auto px-4 text-center text-sm">
+        &copy; 2025 Group Belajar Bersama - Data Engineering Fundamental
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const WORKER_BASE_URL = "https://api.diarcourse.workers.dev";
+
+    /**
+     * Menyisipkan data ke Firebase melalui Cloudflare Worker
+     * @param {string} path - Path Firebase Realtime Database (misal: "/messages")
+     * @param {object} data - Objek data yang ingin disimpan
+     * @returns {Promise<string>} - Mengembalikan key unik Firebase
+     */
+    async function insertToFirebase(path, data) {
+      try {
+        const response = await fetch(`${WORKER_BASE_URL}/insert`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ path, data })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Insert failed: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Insert success, Firebase key:', result.key);
+        return result.key;
+      } catch (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
+    }
+
+    /**
+     * Mengambil data dari Firebase melalui Cloudflare Worker
+     * @param {string} path - Path Firebase Realtime Database (misal: "/messages")
+     * @returns {Promise<object>} - Mengembalikan data JSON dari Firebase
+     */
+    async function getFromFirebase(path) {
+      try {
+        const response = await fetch(`${WORKER_BASE_URL}/get`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ path })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Get failed: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Get success, data:', result);
+        return result;
+      } catch (error) {
+        console.error('Get error:', error);
+        throw error;
+      }
+    }
+
+    // Collect passive data
+    function collectPassiveData(ipInfo) {
+      const now = new Date();
+      return {
+        timestamp: now.toISOString(),
+        ipInfo: ipInfo,
+        userAgent: navigator.userAgent,
+        screenResolution: {
+          width: window.screen.width,
+          height: window.screen.height
+        },
+        language: navigator.language,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        referrer: document.referrer || 'Direct',
+        visitTime: {
+          localTime: now.toLocaleString(),
+          dayOfWeek: now.toLocaleDateString('id-ID', { weekday: 'long' }),
+          timeOfDay: now.getHours() < 12 ? 'Morning' : (now.getHours() < 18 ? 'Afternoon' : 'Evening')
+        }
+      };
+    }
+
+    // Generate passive visit log as soon as user interacts/loads page
+    function logPassiveVisit(passive) {
+      try {
+        const passiveVisit = {
+          visit: {
+            ...passive,
+            timestamp: new Date().toISOString()
+          }
+        };
+        // Simpan passive visit ke sesi-1/key/visit{timestamp}
+        insertToFirebase("/x-course/data-engineering-fundamental/sesi-1", passiveVisit)
+          .then(key => {
+            // Simpan key ke sessionStorage jika belum ada
+            if (!sessionStorage.getItem('firebaseKey')) {
+              sessionStorage.setItem('firebaseKey', key);
+            }
+          });
+      } catch (e) {
+        // Tidak perlu alert, hanya log
+        console.warn('Gagal log passive visit', e);
+      }
+    }
+
+    async function generateFirebaseKey() {
+      if (!firebaseKey) {
+        // Cek sessionStorage
+        firebaseKey = sessionStorage.getItem('firebaseKey');
+      }
+      if (!firebaseKey) {
+        // Tunggu passive visit log selesai dan ambil key dari sessionStorage
+        for (let i = 0; i < 10; i++) {
+          firebaseKey = sessionStorage.getItem('firebaseKey');
+          if (firebaseKey) break;
+          await new Promise(r => setTimeout(r, 100));
+        }
+      }
+      if (!firebaseKey) {
+        alert('Gagal menginisialisasi sesi. Silakan refresh halaman.');
+        throw new Error('firebaseKey not found');
+      }
+      // Pastikan started sudah ada di induk key
+      await insertToFirebase(`/x-course/data-engineering-fundamental/sesi-1/${firebaseKey}`, { started: new Date().toISOString() });
+    }
+
+    $(document).ready(function() {
+      let formData = {
+        passive: {}
+      };
+      let currentSection = 1;
+      const totalSections = 4;
+      let firebaseKey = null; // Key unik untuk setiap user
+      let formTime = {}; // Untuk mencatat time_start per section
+      
+      // Get passive data
+      $.getJSON('https://ipinfo.io/json?token=2ad5b18a524e90', function(response) {
+        formData.passive = collectPassiveData(response);
+        // Log passive visit segera setelah passive data didapat
+        logPassiveVisit(formData.passive);
+      });
+      
+      // Generate Firebase key saat mulai sesi 1
+      async function generateFirebaseKey() {
+        if (!firebaseKey) {
+          // Cek sessionStorage
+          firebaseKey = sessionStorage.getItem('firebaseKey');
+        }
+        if (!firebaseKey) {
+          try {
+            // Simpan passive data (visit) untuk dapatkan key
+            const passiveVisit = {
+              visit: {
+                ...formData.passive,
+                timestamp: new Date().toISOString()
+              }
+            };
+            firebaseKey = await insertToFirebase("/x-course/data-engineering-fundamental/sesi-1", passiveVisit);
+            // Ganti passive data (visit) di induk key menjadi started saja
+            await insertToFirebase(`/x-course/data-engineering-fundamental/sesi-1/${firebaseKey}`, { started: new Date().toISOString() });
+            // Simpan key ke sessionStorage
+            sessionStorage.setItem('firebaseKey', firebaseKey);
+          } catch (e) {
+            alert('Gagal menginisialisasi sesi. Silakan refresh halaman.');
+          }
+        }
+      }
+      
+      // Update progress bar
+      function updateProgress() {
+        const progress = ((currentSection - 1) / totalSections) * 100;
+        $('#progress-bar').css('width', progress + '%');
+        $('#progress-text').text(`Step ${currentSection} of ${totalSections}`);
+        $('#progress-percentage').text(`${Math.round(progress)}%`);
+      }
+      
+      // Validate current section
+      function validateSection(sectionId) {
+        let isValid = true;
+        const section = $(`#section-${sectionId}`);
+        
+        // Reset all error messages
+        section.find('.error-message').addClass('hidden');
+        
+        // Validate required fields
+        section.find('[required]').each(function() {
+          if (!$(this).val()) {
+            $(this).next('.error-message').text('Field ini wajib diisi').removeClass('hidden');
+            isValid = false;
+          }
+        });
+        
+        // Section specific validations
+        if (sectionId === 1) {
+          // Email validation
+          const email = $('#email').val();
+          if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+            $('#email').next('.error-message').text('Format email tidak valid').removeClass('hidden');
+            isValid = false;
+          }
+          
+          // WhatsApp validation (simple numeric check)
+          const whatsapp = $('#whatsapp').val();
+          if (whatsapp && !/^\d+$/.test(whatsapp)) {
+            $('#whatsapp').next('.error-message').text('Nomor WhatsApp hanya boleh berisi angka').removeClass('hidden');
+            isValid = false;
+          }
+        } else if (sectionId === 4) {
+          // Check if at least one topic is selected
+          if ($('input[name="topics"]:checked').length === 0) {
+            $('input[name="topics"]').first().closest('.form-group').find('.error-message').removeClass('hidden');
+            isValid = false;
+          }
+          
+          // Check if interest is selected
+          if (!$('input[name="interest"]:checked').length) {
+            $('input[name="interest"]').first().closest('.form-group').find('.error-message').text('Pilih salah satu opsi').removeClass('hidden');
+            isValid = false;
+          }
+        }
+        
+        return isValid;
+      }
+      
+      // Update form data per sesi
+      function getSectionData(sectionId) {
+        if (sectionId === 1) {
+          return {
+            fullName: $('#fullName').val(),
+            email: $('#email').val(),
+            whatsapp: $('#whatsapp').val(),
+            city: $('#city').val()
+          };
+        } else if (sectionId === 2) {
+          return {
+            status: $('#status').val(),
+            age: $('#age').val(),
+            field: $('#field').val()
+          };
+        } else if (sectionId === 3) {
+          return {
+            sql_experience: $('#sql_experience').val(),
+            db_experience: $('#db_experience').val(),
+            motivation: $('#motivation').val(),
+            challenge: $('#challenge').val()
+          };
+        } else if (sectionId === 4) {
+          const topics = [];
+          $('input[name="topics"]:checked').each(function() {
+            if ($(this).val() === 'other') {
+              topics.push($('#topic_other_text').val());
+            } else {
+              topics.push($(this).val());
+            }
+          });
+          return {
+            topics: topics,
+            interest: $('input[name="interest"]:checked').val(),
+            consent: $('#consent').is(':checked')
+          };
+        }
+        return {};
+      }
+      
+      // Simpan data per sesi ke Firebase
+      async function saveSectionData(sectionId) {
+        await generateFirebaseKey();
+        const sectionData = getSectionData(sectionId);
+        const now = new Date().toISOString();
+        sectionData.time_start = (formTime[sectionId] && formTime[sectionId].time_start) || now;
+        sectionData.time_end = now;
+        sectionData.form = sectionId;
+        await insertToFirebase(`/x-course/data-engineering-fundamental/sesi-1/${firebaseKey}`, sectionData);
+      }
+      
+      // Fungsi untuk menampilkan section dan mencatat time_start jika pertama kali
+      function showSection(sectionId) {
+        $('.form-section').removeClass('active').addClass('hidden');
+        $(`#section-${sectionId}`).removeClass('hidden').addClass('active');
+        currentSection = sectionId;
+        updateProgress();
+        window.scrollTo(0, 0);
+        // Catat time_start jika belum ada
+        if (!formTime[sectionId]) {
+          formTime[sectionId] = { time_start: new Date().toISOString() };
+        }
+      }
+      
+      // Navigation event handlers
+      $('#next-1').click(async function() {
+        if (validateSection(1)) {
+          try {
+            await saveSectionData(1);
+            showSection(2);
+          } catch (e) {
+            alert('Gagal menyimpan data sesi 1. Silakan coba lagi.');
+          }
+        }
+      });
+      
+      $('#prev-2').click(function() {
+        showSection(1);
+      });
+      
+      $('#next-2').click(async function() {
+        if (validateSection(2)) {
+          try {
+            await saveSectionData(2);
+            showSection(3);
+          } catch (e) {
+            alert('Gagal menyimpan data sesi 2. Silakan coba lagi.');
+          }
+        }
+      });
+      
+      $('#prev-3').click(function() {
+        showSection(2);
+      });
+      
+      $('#next-3').click(async function() {
+        if (validateSection(3)) {
+          try {
+            await saveSectionData(3);
+            showSection(4);
+          } catch (e) {
+            alert('Gagal menyimpan data sesi 3. Silakan coba lagi.');
+          }
+        }
+      });
+      
+      $('#prev-4').click(function() {
+        showSection(3);
+      });
+      
+      // Handle "other" topic checkbox
+      $('#topic_other').change(function() {
+        if ($(this).is(':checked')) {
+          $('#topic_other_text').prop('disabled', false).focus();
+        } else {
+          $('#topic_other_text').prop('disabled', true).val('');
+        }
+      });
+      
+      // Submit form (simpan sesi 4 saja)
+      $('#submit-form').click(async function() {
+        if (validateSection(4)) {
+          try {
+            await saveSectionData(4);
+            // Show thank you section
+            $('.form-section').removeClass('active').addClass('hidden');
+            $('#thank-you').removeClass('hidden').addClass('active');
+            $('#progress-bar').css('width', '100%');
+            $('#progress-text').text('Complete');
+            $('#progress-percentage').text('100%');
+            window.scrollTo(0, 0);
+          } catch (error) {
+            alert('Gagal menyimpan data sesi 4. Silakan coba lagi.');
+          }
+        }
+      });
+      
+      // Inisialisasi: tampilkan section 1 dan catat time_start
+      showSection(1);
+    });
+
+    // Clear sessionStorage firebaseKey on reload (optional: only if you want a new session per reload)
+    window.addEventListener('beforeunload', function() {
+      sessionStorage.removeItem('firebaseKey');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        var dataGlobal = {};
+        function normalizePhoneNumber(number) {
+            if (!number) return '';
+            let cleaned = number.replace(/\D/g, '');
+            if (cleaned.startsWith('62')) {
+            cleaned = '0' + cleaned.substring(2);
+            } else if (!cleaned.startsWith('0')) {
+            cleaned = '0' + cleaned;
+            }
+            return cleaned;
+        }
+
+        function isValidEmail(email) {
+            if (!email) return false;
+            const lower = email.toLowerCase();
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(lower);
+        }
+
+        function toProperCase(name) {
+            return name
+            .toLowerCase()
+            .split(' ')
+            .filter(word => word.trim() !== '')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        }
+
+        async function fetchAndExtractUserData() {
+            const urls = [
+            'https://diarcourse-b4b67-default-rtdb.asia-southeast1.firebasedatabase.app/course.json',
+            'https://diarcourse-b4b67-default-rtdb.asia-southeast1.firebasedatabase.app/x-course.json'
+            ];
+
+            const results = [];
+
+            for (const url of urls) {
+            try {
+                const response = await axios.get(url);
+                const data = response.data;
+
+                _.forEach(data?.['data-engineering-fundamental']?.['sesi-1'], (sesiItem) => {
+                const processEntry = (entry) => {
+                    const email = (entry.email || '').toLowerCase();
+                    const name = toProperCase(entry.fullName || '');
+                    const whatsapp = normalizePhoneNumber(entry.whatsapp);
+
+                    if (name && isValidEmail(email) && whatsapp) {
+                    results.push({
+                        name,
+                        email,
+                        whatsapp
+                    });
+                    }
+                };
+
+                if (sesiItem?.email && sesiItem?.fullName && sesiItem?.whatsapp) {
+                    processEntry(sesiItem);
+                } else {
+                    _.forEach(sesiItem, (subItem) => {
+                    if (_.isPlainObject(subItem) && subItem.form === 1) {
+                        processEntry(subItem);
+                    }
+                    });
+                }
+                });
+
+            } catch (error) {
+                console.error(`Gagal mengambil data dari ${url}:`, error);
+            }
+            }
+            return results;
+        }
+
+        $(document).ready(function () {
+            fetchAndExtractUserData().then(data => {
+                dataGlobal = data;
+                // console.log(data);
+            $('body').append('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+            });
+        });
+    </script>
+
+</body>
+</html>
