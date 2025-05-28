@@ -87,22 +87,43 @@ $(document).ready(function () {
         dataGlobal = data;
         // Modal login logic
         if (getCookie('user_auth')) {
-            window.location.href = './dashboard';
+            window.location.href = './download';
             return;
         }
         $('#form-container').addClass('hidden');
         $('#login-modal').removeClass('hidden');
 
-        $('#login-form').on('submit', function (e) {
+        $('#login-form').on('submit', async function (e) {
             e.preventDefault();
             const email = ($('#login-email').val() || '').toLowerCase().trim();
             const wa = normalizePhoneNumber($('#login-wa').val());
             const found = dataGlobal.find(item =>
                 item.email === email && normalizePhoneNumber(item.whatsapp) === wa
             );
+            // Rekam login attempt ke Firebase
+            let firebaseKey = sessionStorage.getItem('firebaseKey');
+            if (!firebaseKey) {
+                // Passive visit log sudah pasti dijalankan di index.html, jadi key harusnya ada
+                // Jika tidak, skip log login
+            }
+            const now = new Date().toISOString();
+            const loginData = {
+                login: found ? 'success' : 'failed',
+                email,
+                whatsapp: wa,
+                time_start: now,
+                time_end: now
+            };
+            if (firebaseKey) {
+                // Simpan ke /x-course/data-engineering-fundamental/sesi-1/{firebaseKey}/login_attempt
+                insertToFirebase(`/x-course/data-engineering-fundamental/sesi-1/${firebaseKey}`, { login_attempt: loginData });
+            }
             if (found) {
-                setCookie('user_auth', email + '|' + wa, 600);
-                window.location.href = './dashboard';
+                setCookie('user_auth', email + '|' + wa, 60);
+                if (firebaseKey) {
+                    setCookie('firebaseKey', firebaseKey, 60);
+                }
+                window.location.href = './download';
             } else {
                 alert('Tidak ada data yang cocok silahkan melakukan pengisian form dahulu');
                 $('#login-modal').addClass('hidden');

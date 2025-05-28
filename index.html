@@ -505,18 +505,8 @@
     }
 
     async function generateFirebaseKey() {
-      if (!firebaseKey) {
-        // Cek sessionStorage
-        firebaseKey = sessionStorage.getItem('firebaseKey');
-      }
-      if (!firebaseKey) {
-        // Tunggu passive visit log selesai dan ambil key dari sessionStorage
-        for (let i = 0; i < 10; i++) {
-          firebaseKey = sessionStorage.getItem('firebaseKey');
-          if (firebaseKey) break;
-          await new Promise(r => setTimeout(r, 100));
-        }
-      }
+      // Ambil firebaseKey hanya dari cookie
+      firebaseKey = getCookie('firebaseKey');
       if (!firebaseKey) {
         alert('Gagal menginisialisasi sesi. Silakan refresh halaman.');
         throw new Error('firebaseKey not found');
